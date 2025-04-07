@@ -11,12 +11,10 @@ type UserController struct {
 	path   string
 }
 
-func NewUserController(prefix string) *UserController {
-	return &UserController{path: prefix}
-}
-
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
+func (controller *UserController) AddRoutes() {
+	controller.routes = []route.Route{
+		{Pattern: "/hello", Handler: http.HandlerFunc(helloWorldHandler)},
+	}
 }
 
 func (controller *UserController) GetPrefix() string {
@@ -24,15 +22,18 @@ func (controller *UserController) GetPrefix() string {
 }
 
 func (controller UserController) RegisterRoutes() *http.ServeMux {
-
-	controller.routes = []route.Route{
-		{Pattern: "/hello", Handler: http.HandlerFunc(helloWorldHandler)},
-	}
-
 	userRouter := http.NewServeMux()
 	for _, route := range controller.routes {
 		userRouter.HandleFunc(route.Pattern, route.Handler.ServeHTTP)
 	}
 
 	return userRouter
+}
+
+func NewUserController(prefix string) *UserController {
+	return &UserController{path: prefix}
+}
+
+func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello, World!"))
 }

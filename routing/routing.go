@@ -33,6 +33,7 @@ func (config *DefaultRouterConfig) RegisterControllers(router *http.ServeMux) {
 
 	for _, controller := range config.Controllers {
 		prefix := controller.GetPrefix()
+		controller.AddRoutes()
 		controllerRouter := controller.RegisterRoutes()
 
 		matched := rgx.Match([]byte(prefix))

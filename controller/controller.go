@@ -7,4 +7,5 @@ import (
 type Controller interface {
 	RegisterRoutes() *http.ServeMux
 	GetPrefix() string
+	AddRoutes()
 }
