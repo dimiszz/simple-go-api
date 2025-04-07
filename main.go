@@ -16,6 +16,7 @@ func main() {
 	routerConfig := routing.DefaultRouterConfig{}
 	middlewareConfig := middleware.DefaultMiddlewareConfig{}
 
+	routerConfig.AddControllers()
 	middlewareConfig.AddMiddlewares()
 
 	defaultConfig := &DefaultAPIConfig{

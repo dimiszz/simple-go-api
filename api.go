@@ -24,7 +24,7 @@ type DefaultAPIConfig struct {
 }
 
 func (s *APIServer) Run(config APIConfig) error {
-	config.RegisterRoutes(s.Router)
+	config.RegisterControllers(s.Router)
 
 	server := &http.Server{
 		Addr:    s.Addr,

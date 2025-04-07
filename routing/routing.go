@@ -1,32 +1,46 @@
 package routing
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+	"regexp"
+
+	"dimi/server/controller"
+	"dimi/server/controller/user"
+)
 
 type RouterConfig interface {
-	RegisterRoutes(router *http.ServeMux)
+	RegisterControllers(router *http.ServeMux)
 }
 
 type DefaultRouterConfig struct {
+	Controllers []controller.Controller
 }
 
-type Route struct {
-	Pattern string
-	Handler http.Handler
+func (config *DefaultRouterConfig) AddControllers() {
+	config.Controllers =
+		[]controller.Controller{
+			user.NewUserController("/user/"),
+		}
 }
 
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
-}
+func (config *DefaultRouterConfig) RegisterControllers(router *http.ServeMux) {
 
-func (config *DefaultRouterConfig) RegisterRoutes(router *http.ServeMux) {
-	routes := []Route{
-		{Pattern: "/hello", Handler: http.HandlerFunc(helloWorldHandler)},
-		{Pattern: "/about", Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("About Page"))
-		})},
+	rgx, err := regexp.Compile(`/.*/`)
+	if err != nil {
+		panic(fmt.Sprintf("string %s in the wrong format: %s", rgx.String(), err.Error()))
 	}
 
-	for _, route := range routes {
-		router.Handle(route.Pattern, route.Handler)
+	for _, controller := range config.Controllers {
+		prefix := controller.GetPrefix()
+		controllerRouter := controller.RegisterRoutes()
+
+		matched := rgx.Match([]byte(prefix))
+
+		if !matched {
+			panic(fmt.Sprintf("string %s in the wrong format", prefix))
+		}
+
+		router.Handle(prefix, http.StripPrefix(prefix[:len(prefix)-1], controllerRouter))
 	}
 }
