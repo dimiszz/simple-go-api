@@ -2,13 +2,19 @@ package user
 
 import (
 	"net/http"
+	"strconv"
 
 	"dimi/server/controller/route"
+	"dimi/server/repository/userRepository"
 )
 
 type UserController struct {
 	routes []route.Route
 	path   string
+}
+
+func NewUserController(prefix string) *UserController {
+	return &UserController{path: prefix}
 }
 
 func (controller *UserController) AddRoutes() {
@@ -30,10 +36,16 @@ func (controller UserController) RegisterRoutes() *http.ServeMux {
 	return userRouter
 }
 
-func NewUserController(prefix string) *UserController {
-	return &UserController{path: prefix}
-}
-
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, World!"))
+}
+
+func getUserByIdHandler(w http.ResponseWriter, r *http.Request) {
+
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		r.Write([]byte("Número inválido!"))
+	}
+
+	userRepository.GetUserById(id)
 }
