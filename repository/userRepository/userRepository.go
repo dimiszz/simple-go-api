@@ -12,6 +12,7 @@ type User struct {
 	balance int
 }
 
+var nextId int = 1
 var users map[int]User
 
 func init() {
@@ -28,11 +29,19 @@ func GetUserById(id int) (User, error) {
 	return user, nil
 }
 
-func CreateUser(user User) error {
+func CreateUser(user *User) error {
 	_, err := GetUserById(user.Id)
 	if err == nil {
 		return errors.New("user already exists")
 	}
+
+	if user.Name == "" {
+		return errors.New("name is required")
+	}
+
+	user.Id = nextId
+	users[nextId] = *user
+	nextId++
 
 	return nil
 }

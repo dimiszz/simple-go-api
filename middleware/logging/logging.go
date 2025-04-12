@@ -12,7 +12,7 @@ type wrappedWriter struct {
 }
 
 func (w *wrappedWriter) WriteHeader(code int) {
-	w.ResponseWriter.WriteHeader(code)
+	//w.ResponseWriter.WriteHeader(code)
 	w.statusCode = code
 }
 
@@ -26,6 +26,6 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(wrapped, r)
-		log.Println(wrapped.statusCode, r.Method, r.URL.Path, time.Since(start).Nanoseconds())
+		log.Println(wrapped.statusCode, r.Method, r.URL.Path, time.Since(start).Milliseconds())
 	})
 }
